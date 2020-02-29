@@ -6,3 +6,4 @@
 | 0.5.24  | Bot stops working if like action is banned. Bot can be started again with `like_per_run: 0` configuration setting |
 | 0.5.25  | Show proper error message if we have issues in getting number of user's followers |
 | 0.5.26  | Show proper error message if we have issues in verifying media before commenting it |
+| 0.7.0   | Refactor class InstaBot: clean a lot of unused variables, fix some obsolete interdependencies |

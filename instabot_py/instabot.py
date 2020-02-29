@@ -60,44 +60,57 @@ class InstaBot:
         else:
             self.config = config
 
-        login = self.config.get('login')
-        password = self.config.get('password')
-        if not login or login == 'YOUR_USERNAME' or \
-                not password or password == 'YOUR_PASSWORD':
+        _login = self.config.get('login')
+        _password = self.config.get('password')
+        if not _login or _login == 'YOUR_USERNAME' or \
+                not _password or _password == 'YOUR_PASSWORD':
             raise CredsMissing()
 
-        self.persistence = PersistenceManager(self.config.get("database"))
+        self.persistence = PersistenceManager(self.config.get('database'))
         self.persistence.bot = self
-        self.session_file = self.config.get("session_file")
-
+        self.session_file = self.config.get('session_file')
+        # log_mod 0 to console, 1 to file
+        self.log_mod = self.config.get('log_mod')
         self.user_agent = self.config.get('user_agent')
         if not self.user_agent:
             self.user_agent = random.sample(self.config.get('list_of_ua'), 1)[0]
         self.bot_start = datetime.datetime.now()
-        self.bot_start_ts = time.time()
-        self.start_at_h = self.config.get("start_at_h")
-        self.start_at_m = self.config.get("start_at_m")
-        self.end_at_h = self.config.get("end_at_h")
-        self.end_at_m = self.config.get("end_at_m")
-        self.window_check_every = self.config.get("window_check_every")
-        self.unfollow_break_min = self.config.get("unfollow_break_min")
-        self.unfollow_break_max = self.config.get("unfollow_break_max")
+
+        # Time settings
+        self.start_at_h = self.config.get('start_at_h')
+        self.start_at_m = self.config.get('start_at_m')
+        self.end_at_h = self.config.get('end_at_h')
+        self.end_at_m = self.config.get('end_at_m')
+        self.time_in_day = 24 * 60 * 60
+        # ?
+        self.window_check_every = self.config.get('window_check_every')
+
+        # Common settings
+        self.instaloader = instaloader.Instaloader()
+        # Default list of tag
+        self.tag_list = self.config.get('tag_list')
+        # Get random tag from a tag_list and like (1 to N) times
+        self.max_like_for_one_tag = self.config.get('max_like_for_one_tag')
+        # Default keywords
+        self.keywords = self.config.get('keywords')
         self.user_blacklist = self.config.get('user_blacklist')
         self.tag_blacklist = self.config.get('tag_blacklist')
-        self.unfollow_whitelist = self.config.get("unfollow_whitelist")
-        self.comment_list = self.config.get('comment_list')
-
-        self.instaloader = instaloader.Instaloader()
-        self.time_in_day = 24 * 60 * 60
+        self.unfollow_whitelist = self.config.get('unfollow_whitelist')
+        # Not implemented yet
+        self.unwanted_username_list = self.config.get('unwanted_username_list')
 
         # Like
-        self.like_per_run = int(self.config.get("like_per_run"))
+        self.like_per_run = int(self.config.get('like_per_run'))
         if self.like_per_run > 0:
             self.like_delay = self.time_in_day / self.like_per_run
+        # Don't like if media have less than n likes
+        self.media_min_like = self.config.get('media_min_like')
+        # Don't like if media have more than N likes
+        self.media_max_like = self.config.get('media_max_like')
 
         # Unlike
-        self.time_till_unlike = self.config.get("time_till_unlike")
-        self.unlike_per_run = int(self.config.get("unlike_per_run"))
+        self.time_till_unlike = self.config.get('time_till_unlike')
+        self.unlike_per_run = int(self.config.get('unlike_per_run'))
         if self.unlike_per_run > 0:
             self.unlike_delay = self.time_in_day / self.unlike_per_run
 
@@ -105,16 +118,21 @@ class InstaBot:
         self.follow_attempts = self.config.get('follow_attempts')
         self.follow_time = self.config.get('follow_time')
         self.follow_per_run = int(self.config.get('follow_per_run'))
-        self.follow_delay = self.config.get('follow_delay')
-        if self.follow_per_run > 0 and not self.follow_delay:
+        if self.follow_per_run > 0:
             self.follow_delay = self.time_in_day / self.follow_per_run
+        # Don't follow if user have less than N followers
+        self.user_min_follow = self.config.get('user_min_follow')
+        # Don't follow if user have more than N followers
+        self.user_max_follow = self.config.get('user_max_follow')
 
         # Unfollow
         self.unfollow_per_run = int(self.config.get('unfollow_per_run'))
-        self.unfollow_delay = self.config.get('unfollow_delay')
-        if self.unfollow_per_run > 0 and not self.unfollow_delay:
+        if self.unfollow_per_run > 0:
             self.unfollow_delay = self.time_in_day / self.unfollow_per_run
-
+        # ?
+        self.unfollow_break_min = self.config.get("unfollow_break_min")
+        # ?
+        self.unfollow_break_max = self.config.get("unfollow_break_max")
         self.unfollow_everyone = self.str2bool(
             self.config.get('unfollow_everyone')
         )
@@ -133,21 +151,14 @@ class InstaBot:
         self.unfollow_selebgram = self.str2bool(
             self.config.get('unfollow_selebgram')
         )
+        # Not implemented yet
+        self.unfollow_from_feed = False
 
         # Comment
         self.comments_per_run = int(self.config.get('comments_per_run'))
-        self.comments_delay = self.config.get('comments_delay')
-        if self.comments_per_run > 0 and not self.comments_delay:
+        if self.comments_per_run > 0:
             self.comments_delay = self.time_in_day / self.comments_per_run
-
-        # Don't like if media have more than n likes.
-        self.media_max_like = self.config.get("media_max_like")
-        # Don't like if media have less than n likes.
-        self.media_min_like = self.config.get("media_min_like")
-        # Don't follow if user have more than n followers.
-        self.user_max_follow = self.config.get("user_max_follow")
-        # Don't follow if user have less than n followers.
-        self.user_min_follow = self.config.get("user_min_follow")
+        self.comment_list = self.config.get('comment_list')
 
         # Like your follower's medias
         self.like_followers_per_run = self.config.get('like_followers_per_run')
@@ -155,75 +166,33 @@ class InstaBot:
             self.like_followers_delay = \
                 self.time_in_day / self.like_followers_per_run
 
-        # Auto mod settings:
-        # Default list of tag.
-        self.tag_list = self.config.get("tag_list")
-        # Default keywords.
-        self.keywords = self.config.get("keywords")
-        # Get random tag, from tag_list, and like (1 to n) times.
-        self.max_like_for_one_tag = self.config.get("max_like_for_one_tag")
-        # log_mod 0 to console, 1 to file
-        self.log_mod = self.config.get("log_mod")
-
+        # Proxy settings
         self.s = requests.Session()
         self.c = requests.Session()
-
         self.proxies = self.config.get('proxies')
         if self.proxies:
-            self.s.proxies = {
-                'http': self.proxies.get('http_proxy'),
-                'https': self.proxies.get('https_proxy'),
-            }
-            self.c.proxies = {
-                'http': self.proxies.get('http_proxy'),
-                'https': self.proxies.get('https_proxy'),
-            }
+            self.s.proxies = {'http': self.proxies.get('http_proxy'),
+                              'https': self.proxies.get('https_proxy')}
+            self.c.proxies = {'http': self.proxies.get('http_proxy'),
+                              'https': self.proxies.get('https_proxy')}
 
-        # All counters.
+        # Action counters
         self.like_counter = 0
         self.like_followers_counter = 0
         self.unlike_counter = 0
         self.follow_counter = 0
         self.unfollow_counter = 0
         self.comments_counter = 0
-        self.current_index = 0
-        self.current_id = "abcds"
-        # List of user_id, that bot follow
-        self.user_info_list = []
-        self.user_list = []
-        self.ex_user_list = []
-        self.unwanted_username_list = []
-        self.is_checked = False
-        self.is_selebgram = False
-        self.is_fake_account = False
-        self.is_active_user = False
-        self.is_following = False
-        self.is_follower = False
-        self.is_rejected = False
-        self.is_self_checking = False
-        self.is_by_tag = False
-        self.is_follower_number = 0
 
+        # Other variables
+        self.user_login = _login
+        self.user_password = _password
         self.user_id = 0
         self.login_status = False
-        self.by_location = False
-
-        self.user_login = login.lower()
-        self.user_password = password
-        self.unfollow_from_feed = False
-        self.medias = []
-        self.media_on_feed = []
-        self.media_by_user = []
-        self.current_owner = ""
+        # Should be refactored
         self.error_400 = 0
-        self.error_400_to_ban = self.config.get("error_400_to_ban")
-        self.ban_sleep_time = self.config.get("ban_sleep_time")
-        self.unwanted_username_list = self.config.get("unwanted_username_list")
-        now_time = datetime.datetime.now()
-        self.logger.info("Instabot v{} started at {}:".format(
-            instabot_py.__version__, now_time.strftime("%d.%m.%Y %H:%M")))
-        self.logger.debug(f"User agent '{self.user_agent}' is used")
-        self.prog_run = True
+        self.error_400_to_ban = self.config.get('error_400_to_ban')
+        self.ban_sleep_time = self.config.get('ban_sleep_time')
         self.next_iteration = {
             "Like": 0,
             "Unlike": 0,
@@ -233,8 +202,16 @@ class InstaBot:
             "Populate": 0,
         }
 
-        self.populate_user_blacklist()
+        # Login into Instagram
+        now_time = datetime.datetime.now()
+        self.logger.info(f"Instabot v{instabot_py.__version__} started at "
+                         f"{now_time.strftime('%Y-%b-%d %H:%M:%S')}")
+        self.logger.debug(f"User agent '{self.user_agent}' is used")
+        self.prog_run = True
         self.login()
+        # Not implemented yet
+        # self.populate_user_blacklist()
+        # Need to check this part later
         self.csrftoken = ''
         signal.signal(signal.SIGINT, self.cleanup)
         signal.signal(signal.SIGTERM, self.cleanup)
@@ -411,7 +388,7 @@ class InstaBot:
                             self.logger.info("Entered code is not correct, "
                                              "Please try again later")
                             return
-                        self.csrftoken = complete_challenge.cookies["csrftoken"]
+                        self.csrftoken = complete_challenge.cookies['csrftoken']
                         self.s.headers.update(
                             {"X-CSRFToken": self.csrftoken,
                              "X-Instagram-AJAX": "1"}
@@ -995,7 +972,7 @@ class InstaBot:
         return True
 
     def verify_account(self, username):
-        return username != self.login \
+        return username != self.user_login \
                and self.verify_account_name(username) \
                and self.verify_account_followers(username)
 
