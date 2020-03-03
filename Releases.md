@@ -7,3 +7,4 @@
 | 0.5.25  | Show proper error message if we have issues in getting number of user's followers |
 | 0.5.26  | Show proper error message if we have issues in verifying media before commenting it |
 | 0.7.0   | Refactor class InstaBot: clean a lot of unused variables, fix some obsolete interdependencies |
+| 0.7.1   | Make login to IG simpler. Should fix issues with login |

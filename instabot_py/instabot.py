@@ -415,7 +415,7 @@ class InstaBot:
             self.s.cookies['ig_pr'] = '1.25'
             self.s.cookies['ig_vh'] = '772'
             self.s.cookies['ig_or'] = 'landscape-primary'
-            time.sleep(10 * random.random())
+            time.sleep(random.gauss(7, 2))
 
         if successful_login:
             try:
@@ -426,19 +426,9 @@ class InstaBot:
                 self.s.headers.update({"X-CSRFToken": self.csrftoken})
                 finder = r.text.find(self.user_login)
                 if finder != -1:
-                    self.user_id = self.get_user_id_by_username(self.user_login)
-                    if self.user_id:
-                        self.login_status = True
-                        self.logger.info(f"{self.user_login} has logged in "
-                                         f"successfully!")
-                    else:
-                        self.logger.critical(f"Could not login into Instagram "
-                                             f"with user {self.user_login}")
-                        if self.session_file and os.path.isfile(
-                                self.session_file):
-                            self.remove_spoiled_session_file(self.session_file)
-                        return
-
+                    self.login_status = True
+                    self.logger.info(f"{self.user_login} has logged in "
+                                     f"successfully!")
                     if self.session_file:
                         self.logger.info(f"Saving cookies to the session file "
                                          f"{self.session_file}")
@@ -452,7 +442,6 @@ class InstaBot:
                     self.logger.error("Login error! Check your login data!")
                     if self.session_file and os.path.isfile(self.session_file):
                         self.remove_spoiled_session_file(self.session_file)
-
                     self.prog_run = False
             except Exception as exc:
                 self.logger.exception(exc)
