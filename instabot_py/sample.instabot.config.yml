@@ -2,6 +2,12 @@
 login: "YOUR_USERNAME"
 password: "YOUR_PASSWORD"
 
+start_at_h: 0
+start_at_m: 0
+end_at_h: 23
+end_at_m: 59
+window_check_every: 60
+
 debug: 0
 user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101 Firefox/68.0"
 

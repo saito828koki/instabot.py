@@ -81,8 +81,10 @@ class InstaBot:
         self.start_at_m = self.config.get('start_at_m')
         self.end_at_h = self.config.get('end_at_h')
         self.end_at_m = self.config.get('end_at_m')
-        self.time_in_day = 24 * 60 * 60
-        # ?
+        _st = datetime.datetime(1, 1, 1, self.start_at_h, self.start_at_m, 0)
+        _end = datetime.datetime(1, 1, 1, self.end_at_h, self.end_at_m, 59)
+        _delta = abs(int((_end - _st).total_seconds())) + 1
+        self.time_in_run = _delta
         self.window_check_every = self.config.get('window_check_every')
 
         # Common settings
@@ -102,7 +104,7 @@ class InstaBot:
         # Like
         self.like_per_run = int(self.config.get('like_per_run'))
         if self.like_per_run > 0:
-            self.like_delay = self.time_in_day / self.like_per_run
+            self.like_delay = self.time_in_run / self.like_per_run
         # Don't like if media have less than n likes
         self.media_min_like = self.config.get('media_min_like')
         # Don't like if media have more than N likes
@@ -112,14 +114,14 @@ class InstaBot:
         self.time_till_unlike = self.config.get('time_till_unlike')
         self.unlike_per_run = int(self.config.get('unlike_per_run'))
         if self.unlike_per_run > 0:
-            self.unlike_delay = self.time_in_day / self.unlike_per_run
+            self.unlike_delay = self.time_in_run / self.unlike_per_run
 
         # Follow
         self.follow_attempts = self.config.get('follow_attempts')
         self.follow_time = self.config.get('follow_time')
         self.follow_per_run = int(self.config.get('follow_per_run'))
         if self.follow_per_run > 0:
-            self.follow_delay = self.time_in_day / self.follow_per_run
+            self.follow_delay = self.time_in_run / self.follow_per_run
         # Don't follow if user have less than N followers
         self.user_min_follow = self.config.get('user_min_follow')
         # Don't follow if user have more than N followers
@@ -128,7 +130,7 @@ class InstaBot:
         # Unfollow
         self.unfollow_per_run = int(self.config.get('unfollow_per_run'))
         if self.unfollow_per_run > 0:
-            self.unfollow_delay = self.time_in_day / self.unfollow_per_run
+            self.unfollow_delay = self.time_in_run / self.unfollow_per_run
         # ?
         self.unfollow_break_min = self.config.get("unfollow_break_min")
         # ?
@@ -157,14 +159,14 @@ class InstaBot:
         # Comment
         self.comments_per_run = int(self.config.get('comments_per_run'))
         if self.comments_per_run > 0:
-            self.comments_delay = self.time_in_day / self.comments_per_run
+            self.comments_delay = self.time_in_run / self.comments_per_run
         self.comment_list = self.config.get('comment_list')
 
         # Like your follower's medias
         self.like_followers_per_run = self.config.get('like_followers_per_run')
         if self.like_followers_per_run > 0:
             self.like_followers_delay = \
-                self.time_in_day / self.like_followers_per_run
+                self.time_in_run / self.like_followers_per_run
 
         # Proxy settings
         self.s = requests.Session()
@@ -728,8 +730,6 @@ class InstaBot:
         self.mainloop()
 
     def run_during_time_window(self):
-        # TODO this method is subject of deprecation
-
         now = datetime.datetime.now()
         # distance between start time and now
         dns = self.time_dist(
@@ -740,7 +740,10 @@ class InstaBot:
             datetime.time(self.end_at_h, self.end_at_m), now.time()
         )
         if not ((dns == 0 or dne < dns) and dne != 0):
-            self.logger.info(f"Pause for {self.window_check_every} seconds")
+            self.logger.info(f"Now it's time to rest for the bot according to "
+                             f"the 'start_at_h', 'start_at_h', 'end_at_h' and "
+                             f"'end_at_m' settings. Pause for "
+                             f"{self.window_check_every} seconds")
             time.sleep(self.window_check_every)
             return False
         else:
