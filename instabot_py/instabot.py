@@ -91,6 +91,7 @@ class InstaBot:
         self.instaloader = instaloader.Instaloader()
         # Default list of tag
         self.tag_list = self.config.get('tag_list')
+        self.webhook_url = self.config.get('webhook_url')
         # Get random tag from a tag_list and like (1 to N) times
         self.max_like_for_one_tag = self.config.get('max_like_for_one_tag')
         # Default keywords
@@ -784,7 +785,8 @@ class InstaBot:
                 medias = self.get_medias()
 
             media = medias.pop()
-            self.new_auto_mod_like(media)
+            # self.new_auto_mod_like(media)
+            self.slack_notification(media)
             self.new_auto_mod_unlike()
 
             if self.iteration_ready('follow') and self.follow_per_run and media:
@@ -839,6 +841,21 @@ class InstaBot:
                     self.like_counter += 1
                     self.logger.info(f"Liked media #{self.like_counter}: "
                                      f"id: {media_id}, url: {media_url}")
+                    return True
+        return False
+    
+    def slack_notification(self, media):
+        if self.iteration_ready('like') and media:
+            self.init_next_iteration('like')
+            media_id = media['node']['id']
+            media_url = self.get_media_url(media_id)
+            self.logger.debug(f"Trying to like media #{self.like_counter + 1}: "
+                              f"id: {media_id}, url: {media_url}")
+            if self.verify_media(media):
+                WEB_HOOK_URL = self.webhook_url
+                requests.post(WEB_HOOK_URL, data = json.dumps({
+                    'text': media_url
+                }))
                     return True
         return False
 
