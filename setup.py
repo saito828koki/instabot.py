@@ -31,8 +31,8 @@ setup(
     long_description_content_type='text/markdown',
     author="Pasha Lev",
     author_email='levpasha@gmail.com',
-    url="https://github.com/instabot-py/instabot.py",
-    download_url="https://github.com/instabot-py/instabot.py/tarball/master",
+    url="https://github.com/saito828koki/instabot.py",
+    download_url="https://github.com/saito828koki/instabot.py/tarball/master",
     keywords="Instagram bot, Instagram API hack",
     install_requires=required,
     entry_points={
