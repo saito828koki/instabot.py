@@ -493,14 +493,14 @@ class InstaBot:
                 try:
                     all_data = json.loads(r.text)
                     medias = list(all_data['graphql']['location'][
-                                      'edge_location_to_media']['edges'])
+                        'edge_location_to_media']['edges'])
                 except Exception as exc:
                     self.logger.exception(exc)
             else:
                 try:
                     all_data = json.loads(r.text)
                     medias = list(all_data['graphql']['hashtag'][
-                                      'edge_hashtag_to_media']['edges'])
+                        'edge_hashtag_to_media']['edges'])
                 except Exception as exc:
                     self.logger.exception(exc)
         else:
@@ -520,7 +520,7 @@ class InstaBot:
             self.logger.debug(f"Retrieved {len(medias_raw)} medias")
             max_tag_like_count = random.randint(1, self.max_like_for_one_tag)
             medias = self.remove_already_liked_medias(medias_raw)[
-                     :max_tag_like_count]
+                :max_tag_like_count]
             self.logger.debug(f"Selected {len(medias)} medias to process. "
                               f"Increase max_like_for_one_tag value for more "
                               f"processing medias")
@@ -843,7 +843,7 @@ class InstaBot:
                                      f"id: {media_id}, url: {media_url}")
                     return True
         return False
-    
+
     def slack_notification(self, media):
         if self.iteration_ready('like') and media:
             self.init_next_iteration('like')
@@ -853,10 +853,10 @@ class InstaBot:
                               f"id: {media_id}, url: {media_url}")
             if self.verify_media(media):
                 WEB_HOOK_URL = self.webhook_url
-                requests.post(WEB_HOOK_URL, data = json.dumps({
+                requests.post(WEB_HOOK_URL, data=json.dumps({
                     'text': media_url
                 }))
-                    return True
+                return True
         return False
 
     def like_followers_last_media(self):
@@ -982,8 +982,8 @@ class InstaBot:
 
     def verify_account(self, username):
         return username != self.user_login \
-               and self.verify_account_name(username) \
-               and self.verify_account_followers(username)
+            and self.verify_account_name(username) \
+            and self.verify_account_followers(username)
 
     def new_auto_mod_follow(self, media):
         user_id = media['node']['owner']['id']
@@ -1174,8 +1174,8 @@ class InstaBot:
 
     def account_is_active(self, user_info):
         return user_info.get("medias") > 0 \
-               and (user_info.get("follows") / user_info.get("medias") < 25) \
-               and (user_info.get("followers") / user_info.get("medias") < 25)
+            and (user_info.get("follows") / user_info.get("medias") < 25) \
+            and (user_info.get("followers") / user_info.get("medias") < 25)
 
     def account_is_following_you(self, user_info):
         return user_info.get("follows_viewer") or user_info.get("has_requested_viewer")
@@ -1206,7 +1206,7 @@ class InstaBot:
         action_counter_per_run = getattr(self, action + "_per_run", 0)
         registered_time = self.next_iteration.get(action, 0)
         return action_counter < action_counter_per_run \
-               and 0 <= registered_time < time.time()
+            and 0 <= registered_time < time.time()
 
     def generate_comment(self):
         c_list = list(itertools.product(*self.comment_list))
