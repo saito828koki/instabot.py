@@ -20,7 +20,7 @@ except IOError:
     README = ''
 
 setup(
-    name='instabot-py',
+    name='saito-instabot-py',
     packages=find_packages(),
     package_data={'': ['sample.instabot.config.yml']},
     version=__version__,
