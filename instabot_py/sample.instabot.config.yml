@@ -14,6 +14,7 @@ user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101 F
 tag_list: ["cute", "follow4follow", "f4f"]
 tag_blacklist: ["sex", "porno"]
 
+webhookurl: "https://hooks.slack.com/services/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"
 like_per_day: 196
 max_like_for_one_tag: 36
 media_min_like: 20

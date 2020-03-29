@@ -32,6 +32,7 @@ DEFAULT_CONFIG = {
     "start_at_m": 0,
     "follow_time_enabled": True,
     "follow_time": 259200,
+    "webhookurl": "https://hooks.slack.com/services/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",
     "unfollow_break_min": 15,
     "max_like_for_one_tag": 5,
     "session_file": "{{login}}.session",
