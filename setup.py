@@ -36,7 +36,7 @@ setup(
     keywords="Instagram bot, Instagram API hack",
     install_requires=required,
     entry_points={
-        "console_scripts": ["instabot-py = instabot_py.__main__:main"]
+        "console_scripts": ["saito-instabot-py = instabot_py.__main__:main"]
     },
     classifiers=[
         "Development Status :: 5 - Production/Stable",
