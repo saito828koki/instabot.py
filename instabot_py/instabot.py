@@ -853,9 +853,8 @@ class InstaBot:
                               f"id: {media_id}, url: {media_url}")
             if self.verify_media(media):
                 WEB_HOOK_URL = self.webhook_url
-                requests.post(WEB_HOOK_URL, data=json.dumps({
-                    'text': media_url
-                }))
+                slack = slackweb.Slack(url=WEB_HOOK_URL)
+                slack.notify(text=str(media_url))
                 return True
         return False
 
