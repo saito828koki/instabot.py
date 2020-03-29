@@ -13,6 +13,7 @@ import random
 import re
 import signal
 import time
+import slackweb
 
 import instaloader
 import requests
